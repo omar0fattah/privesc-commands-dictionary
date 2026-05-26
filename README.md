@@ -9,7 +9,7 @@ A structured reference for Windows and Linux privilege escalation. From user enu
 > **⚠️ Legal Disclaimer**  
 > This guide is for **educational purposes only**. Only use these techniques on systems you own or have written permission to test. Unauthorized access is illegal.
 
-> 📘 **New to privesc?** Start with the [Tutorial](TUTORIAL.md) for beginners.
+> 📘 **New to privesc?** Start with the [Tutorial.md](TUTORIAL.md) for beginners.
 > 📄 **Quick Reference:** [One-page cheat sheet](QUICKREF.md) for the most common commands.
 > 🧠 **Operational Guide:** [GUIDE.md](GUIDE.md) for strategy and depth.
 
