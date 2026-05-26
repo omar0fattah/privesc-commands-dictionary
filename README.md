@@ -2,7 +2,9 @@
 
 <a name="top"></a>
 
-# Privilege Escalation Commands
+---
+
+## Privilege Escalation Commands
 
 A structured reference for Windows and Linux privilege escalation. From user enumeration to root.
 
